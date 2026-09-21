@@ -1,0 +1,4 @@
+const toggle=document.querySelector('.menu-toggle');const links=document.querySelector('.nav-links');if(toggle){toggle.addEventListener('click',()=>{const open=links.classList.toggle('open');toggle.setAttribute('aria-expanded',open)});links.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{links.classList.remove('open');toggle.setAttribute('aria-expanded','false')}));}
+
+const motionOkay=!window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(motionOkay&&'IntersectionObserver'in window){const targets=document.querySelectorAll('.section,.cta,.work-card,.values article');const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('is-visible');observer.unobserve(entry.target)}}),{threshold:.14});targets.forEach((element,index)=>{element.classList.add('animate-in');element.style.transitionDelay=`${Math.min((index%3)*80,160)}ms`;observer.observe(element)});}
