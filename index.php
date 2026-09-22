@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/app/public.php';
 $submitted = $_SERVER['REQUEST_METHOD'] === 'POST';
 $name = trim($_POST['name'] ?? '');
 $email = filter_var(trim($_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL);
@@ -6,19 +7,16 @@ $message = trim($_POST['message'] ?? '');
 $status = '';
 if ($submitted) {
     if ($name && $email && $message) {
-        $record = [date('c'), $name, $email, str_replace(["\r", "\n"], ' ', $message)];
-        $storage = __DIR__ . DIRECTORY_SEPARATOR . 'storage';
-        if (!is_dir($storage)) { mkdir($storage, 0750, true); }
-        $handle = fopen($storage . DIRECTORY_SEPARATOR . 'messages.csv', 'ab');
-        if ($handle) {
-            flock($handle, LOCK_EX);
-            fputcsv($handle, $record);
-            flock($handle, LOCK_UN);
-            fclose($handle);
-            $status = 'Thank you, ' . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') . '. Your message has been received.';
-        } else {
-            $status = 'We could not save your message just now. Please try again shortly.';
+        $saved = false;
+        try { require_once __DIR__ . '/app/bootstrap.php'; db()->prepare('INSERT INTO contact_messages (name,email,message) VALUES (?,?,?)')->execute([$name,$email,$message]); $saved=true; } catch (Throwable $error) {}
+        if (!$saved) {
+            $record = [date('c'), $name, $email, str_replace(["\r", "\n"], ' ', $message)];
+            $storage = __DIR__ . DIRECTORY_SEPARATOR . 'storage';
+            if (!is_dir($storage)) { mkdir($storage, 0750, true); }
+            $handle = fopen($storage . DIRECTORY_SEPARATOR . 'messages.csv', 'ab');
+            if ($handle) { flock($handle, LOCK_EX); fputcsv($handle, $record); flock($handle, LOCK_UN); fclose($handle); $saved=true; }
         }
+        $status = $saved ? 'Thank you, ' . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') . '. Your message has been received.' : 'We could not save your message just now. Please try again shortly.';
     } else {
         $status = 'Please add your name, a valid email address, and a short message.';
     }
@@ -46,7 +44,7 @@ if ($submitted) {
       <a class="brand" href="#top" aria-label="AIDA home"><img src="Logo.png" alt="AIDA — Africa Innovation & Development Academy"></a>
       <button class="menu-toggle" aria-expanded="false" aria-controls="nav-links"><span></span><span></span><span></span><span class="sr-only">Open menu</span></button>
       <div class="nav-links" id="nav-links">
-        <a href="#about">About us</a><a href="#work">Our work</a><a href="governance.php">Governance</a><a href="#contact" class="nav-cta">Partner with us <span>↗</span></a>
+        <a href="#about">About us</a><a href="#work">Our work</a><a href="insights.php">Insights</a><a href="governance.php">Governance</a><a href="#contact" class="nav-cta">Partner with us <span>↗</span></a>
       </div>
     </nav>
   </header>
@@ -57,8 +55,8 @@ if ($submitted) {
       <div class="container hero-grid row align-items-center g-5">
         <div class="hero-copy reveal col-lg-7">
           <p class="eyebrow"><span></span> Africa Innovation &amp; Development Academy</p>
-          <h1>Ideas that move <em>Ghana</em> and Africa forward.</h1>
-          <p class="hero-text">AIDA is a civil society think and do platform transforming evidence, dialogue and innovation into practical pathways for inclusive economic development.</p>
+          <h1><?= cms_text('hero_title', 'Ideas that move Ghana and Africa forward.') ?></h1>
+          <p class="hero-text"><?= cms_text('hero_text', 'AIDA is a civil society think and do platform transforming evidence, dialogue and innovation into practical pathways for inclusive economic development.') ?></p>
           <div class="hero-actions"><a class="button button-gold" href="#work">Explore our work <span>↓</span></a><a class="text-link" href="#about">Discover AIDA <span>→</span></a></div>
         </div>
         <div class="hero-art reveal col-lg-5">
