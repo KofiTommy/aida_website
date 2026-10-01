@@ -1,4 +1,8 @@
 <?php
+// Start the configured session before the homepage sends any HTML.
+if (is_file(__DIR__ . '/config.local.php')) {
+    try { require_once __DIR__ . '/bootstrap.php'; } catch (Throwable $error) {}
+}
 function cms_setting(string $key, string $fallback): string {
     static $settings = null;
     if ($settings === null) {

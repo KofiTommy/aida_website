@@ -5,11 +5,22 @@ require_login();
 
 $types=['insight'=>'Insights & News','publication'=>'Publications','project'=>'Projects & Impact','event'=>'Events & Videos','governance'=>'Governance Documents'];
 $section=$_GET['section'] ?? 'dashboard';
-if (!in_array($section,['dashboard','content','editor','media','messages','settings','users'],true)) $section='dashboard';
+if (!in_array($section,['dashboard','content','editor','media','messages','applications','settings','users'],true)) $section='dashboard';
 $user=current_user();
 
 if ($_SERVER['REQUEST_METHOD']==='POST') {
     verify_csrf(); $action=$_POST['action'] ?? '';
+    if ($action==='review_application') {
+        require_role(['administrator','editor']);
+        $status=$_POST['status']??'';
+        if(is_string($status) && in_array($status,['new','reviewing','accepted','declined'],true)) {
+            $id=(int)($_POST['id']??0);
+            db()->prepare('UPDATE applications SET status=? WHERE id=?')->execute([$status,$id]);
+            audit('review','application',$id);
+            flash('success','Application status updated.');
+        }
+        header('Location: index.php?section=applications'); exit;
+    }
     if ($action==='save_content') {
         require_role(['administrator','editor','contributor']);
         $id=(int)($_POST['id']??0); $type=$_POST['content_type']??'insight'; $title=trim($_POST['title']??''); $status=$_POST['status']??'draft';
@@ -39,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     if ($action==='create_user') { require_role(['administrator']);$name=trim($_POST['name']??'');$email=filter_var(trim($_POST['email']??''),FILTER_VALIDATE_EMAIL);$password=$_POST['password']??'';$role=$_POST['role']??'contributor';if(!$name||!$email||strlen($password)<12||!in_array($role,['administrator','editor','contributor'],true)){flash('error','Use a name, valid email, role, and password of at least 12 characters.');}else{try{db()->prepare('INSERT INTO users(name,email,password_hash,role)VALUES(?,?,?,?)')->execute([$name,$email,password_hash($password,PASSWORD_DEFAULT),$role]);audit('create','user',(int)db()->lastInsertId());flash('success','Team account created.');}catch(PDOException $e){flash('error','That email address is already in use.');}}header('Location: index.php?section=users');exit; }
 }
 function admin_header(string $title,string $section): void { global $user; ?>
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?= e($title) ?> | AIDA Portal</title><link rel="stylesheet" href="../assets/css/admin.css"></head><body><div class="admin-shell"><aside class="admin-side"><a class="brand" href="../index.php"><img src="../Logo.png" alt="AIDA"></a><nav><a class="<?= $section==='dashboard'?'active':'' ?>" href="index.php">Overview</a><a class="<?= in_array($section,['content','editor'],true)?'active':'' ?>" href="index.php?section=content">Content</a><a class="<?= $section==='media'?'active':'' ?>" href="index.php?section=media">Media & Documents</a><a class="<?= $section==='messages'?'active':'' ?>" href="index.php?section=messages">Messages</a><?php if($user['role']==='administrator'): ?><a class="<?= $section==='settings'?'active':'' ?>" href="index.php?section=settings">Home Page</a><a class="<?= $section==='users'?'active':'' ?>" href="index.php?section=users">Team Access</a><?php endif; ?></nav><a class="signout" href="logout.php">Sign out</a></aside><main class="admin-main"><header class="admin-top"><div><h1><?= e($title) ?></h1><p>Manage AIDA’s public website.</p></div><span class="user-pill"><?= e($user['name']) ?> · <?= e(ucfirst($user['role'])) ?></span></header><?php if($m=flash('success')):?><div class="admin-alert success"><?=e($m)?></div><?php endif;?><?php if($m=flash('error')):?><div class="admin-alert error"><?=e($m)?></div><?php endif;?>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?= e($title) ?> | AIDA Portal</title><link rel="stylesheet" href="../assets/css/admin.css"></head><body><div class="admin-shell"><aside class="admin-side"><a class="brand" href="../index.php"><img src="../Logo.png" alt="AIDA"></a><nav><a class="<?= $section==='dashboard'?'active':'' ?>" href="index.php">Overview</a><a class="<?= in_array($section,['content','editor'],true)?'active':'' ?>" href="index.php?section=content">Content</a><a class="<?= $section==='media'?'active':'' ?>" href="index.php?section=media">Media & Documents</a><?php if(in_array($user['role'],['administrator','editor'],true)): ?><a class="<?= $section==='messages'?'active':'' ?>" href="index.php?section=messages">Messages</a><a class="<?= $section==='applications'?'active':'' ?>" href="index.php?section=applications">Applications</a><?php endif; ?><?php if($user['role']==='administrator'): ?><a class="<?= $section==='settings'?'active':'' ?>" href="index.php?section=settings">Home Page</a><a class="<?= $section==='users'?'active':'' ?>" href="index.php?section=users">Team Access</a><?php endif; ?></nav><a class="signout" href="logout.php">Sign out</a></aside><main class="admin-main"><header class="admin-top"><div><h1><?= e($title) ?></h1><p>Manage AIDA’s public website.</p></div><span class="user-pill"><?= e($user['name']) ?> · <?= e(ucfirst($user['role'])) ?></span></header><?php if($m=flash('success')):?><div class="admin-alert success"><?=e($m)?></div><?php endif;?><?php if($m=flash('error')):?><div class="admin-alert error"><?=e($m)?></div><?php endif;?>
 <?php }
 function admin_footer(): void { echo '</main></div></body></html>'; }
 
@@ -63,3 +74,16 @@ if ($section==='settings') { require_role(['administrator']);$settings=db()->que
 
 if ($section==='users') { require_role(['administrator']);$users=db()->query('SELECT id,name,email,role,is_active,last_login_at,created_at FROM users ORDER BY created_at DESC')->fetchAll();admin_header('Team Access','users');?>
 <section class="admin-card"><h2>Add a team member</h2><form method="post" class="editor-form"><input type="hidden" name="csrf" value="<?=csrf()?>"><input type="hidden" name="action" value="create_user"><div class="form-grid"><label>Name<input name="name" required></label><label>Email<input type="email" name="email" required></label><label>Role<select name="role"><option value="contributor">Contributor — drafts only</option><option value="editor">Editor — can publish</option><option value="administrator">Administrator — full access</option></select></label><label>Password <small>At least 12 characters</small><input type="password" name="password" minlength="12" required></label></div><button class="admin-button">Create account →</button></form></section><section class="admin-card"><h2>Current access</h2><table class="data-table"><tr><th>Name</th><th>Email</th><th>Role</th><th>Last sign in</th></tr><?php foreach($users as $member):?><tr><td><?=e($member['name'])?></td><td><?=e($member['email'])?></td><td><span class="badge"><?=e($member['role'])?></span></td><td><?=e($member['last_login_at']?date('d M Y',strtotime($member['last_login_at'])):'Not yet')?></td></tr><?php endforeach;?></table></section><?php admin_footer();exit; }
+
+if ($section==='applications') {
+    require_role(['administrator','editor']);
+    $applications=db()->query('SELECT * FROM applications ORDER BY created_at DESC LIMIT 100')->fetchAll();
+    admin_header('Applications','applications'); ?>
+<section class="admin-card"><h2>People interested in joining AIDA</h2><p class="hint">Review applications and record a decision. Status changes do not send emails; contact applicants separately.</p>
+<?php if (!$applications): ?><p>No applications have been received yet.</p><?php endif; ?>
+<?php foreach($applications as $application): ?><details class="application-record"><summary><b><?=e($application['name'])?></b> · <?=e($application['interest'])?> <span class="badge"><?=e($application['status'])?></span></summary>
+<p><b>Email:</b> <a href="mailto:<?=e($application['email'])?>"><?=e($application['email'])?></a><br><b>Phone:</b> <?=e($application['phone'])?><br><b>Location:</b> <?=e($application['location'])?><br><b>Organisation:</b> <?=e($application['organisation'])?><br><b>Received:</b> <?=e($application['created_at'])?></p>
+<h3>Skills and experience</h3><p><?=nl2br(e($application['expertise']))?></p><h3>Reason for joining</h3><p><?=nl2br(e($application['motivation']))?></p>
+<form method="post" class="application-review"><input type="hidden" name="csrf" value="<?=csrf()?>"><input type="hidden" name="action" value="review_application"><input type="hidden" name="id" value="<?=$application['id']?>"><label>Status <select name="status"><?php foreach(['new','reviewing','accepted','declined'] as $s): ?><option value="<?=$s?>" <?=$application['status']===$s?'selected':''?>><?=ucfirst($s)?></option><?php endforeach; ?></select></label><button class="admin-button">Save status</button></form></details><?php endforeach; ?></section>
+<?php admin_footer(); exit; }
+

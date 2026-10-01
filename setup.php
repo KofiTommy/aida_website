@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $schema = file_get_contents(__DIR__ . '/database/schema.sql');
             $schema = preg_replace('/CREATE DATABASE[^;]+;\s*USE[^;]+;\s*/i', '', $schema);
             foreach (array_filter(array_map('trim', explode(';', $schema))) as $statement) { $pdo->exec($statement); }
+            $pdo->exec(file_get_contents(__DIR__ . '/database/applications.sql'));
             $stmt=$pdo->prepare('INSERT INTO users (name,email,password_hash,role) VALUES (?,?,?,"administrator")');
             $stmt->execute([$owner,$email,password_hash($ownerPass,PASSWORD_DEFAULT)]);
             $key=bin2hex(random_bytes(32));

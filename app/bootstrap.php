@@ -5,7 +5,17 @@ $configFile = __DIR__ . '/config.local.php';
 if (!is_file($configFile)) {
     throw new RuntimeException('AIDA CMS has not been configured. Copy app/config.sample.php to app/config.local.php.');
 }
-$config = require $configFile;
+$loadedConfig = require $configFile;
+if (!is_array($loadedConfig) || !isset($loadedConfig['db']) || !is_array($loadedConfig['db'])) {
+    throw new RuntimeException('The AIDA database configuration is invalid. Check app/config.local.php.');
+}
+foreach (['host', 'port', 'name', 'user', 'pass'] as $key) {
+    if (!array_key_exists($key, $loadedConfig['db']) || !is_string($loadedConfig['db'][$key])) {
+        throw new RuntimeException('The AIDA database configuration is missing a valid connection field.');
+    }
+}
+// Includes can run inside cms_setting(); explicitly preserve configuration globally.
+$GLOBALS['config'] = $loadedConfig;
 
 session_name('aida_session');
 session_set_cookie_params([

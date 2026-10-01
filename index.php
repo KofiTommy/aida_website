@@ -1,26 +1,5 @@
 <?php
 require_once __DIR__ . '/app/public.php';
-$submitted = $_SERVER['REQUEST_METHOD'] === 'POST';
-$name = trim($_POST['name'] ?? '');
-$email = filter_var(trim($_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL);
-$message = trim($_POST['message'] ?? '');
-$status = '';
-if ($submitted) {
-    if ($name && $email && $message) {
-        $saved = false;
-        try { require_once __DIR__ . '/app/bootstrap.php'; db()->prepare('INSERT INTO contact_messages (name,email,message) VALUES (?,?,?)')->execute([$name,$email,$message]); $saved=true; } catch (Throwable $error) {}
-        if (!$saved) {
-            $record = [date('c'), $name, $email, str_replace(["\r", "\n"], ' ', $message)];
-            $storage = __DIR__ . DIRECTORY_SEPARATOR . 'storage';
-            if (!is_dir($storage)) { mkdir($storage, 0750, true); }
-            $handle = fopen($storage . DIRECTORY_SEPARATOR . 'messages.csv', 'ab');
-            if ($handle) { flock($handle, LOCK_EX); fputcsv($handle, $record); flock($handle, LOCK_UN); fclose($handle); $saved=true; }
-        }
-        $status = $saved ? 'Thank you, ' . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') . '. Your message has been received.' : 'We could not save your message just now. Please try again shortly.';
-    } else {
-        $status = 'Please add your name, a valid email address, and a short message.';
-    }
-}
 ?>
 <!doctype html>
 <html lang="en">
@@ -44,7 +23,7 @@ if ($submitted) {
       <a class="brand" href="#top" aria-label="AIDA home"><img src="Logo.png" alt="AIDA — Africa Innovation & Development Academy"></a>
       <button class="menu-toggle" aria-expanded="false" aria-controls="nav-links"><span></span><span></span><span></span><span class="sr-only">Open menu</span></button>
       <div class="nav-links" id="nav-links">
-        <a href="#about">About us</a><a href="#work">Our work</a><a href="insights.php">Insights</a><a href="governance.php">Governance</a><a href="#contact" class="nav-cta">Partner with us <span>↗</span></a>
+        <a href="#about">About us</a><a href="#work">Our work</a><a href="insights.php">Insights</a><a href="governance.php">Governance</a><a href="join.php" class="nav-cta">Partner with us <span>↗</span></a>
       </div>
     </nav>
   </header>
@@ -67,11 +46,25 @@ if ($submitted) {
     </section>
 
     <section class="intro section" id="about">
-      <div class="container intro-grid row g-5"><p class="section-kicker col-md-4">01 / WHO WE ARE</p><div class="col-md-8"><h2>A home for brave ideas and <em>better development.</em></h2><p class="lead">Africa Innovation &amp; Development Academy brings together curious minds, communities, institutions and decision makers to address the questions that shape Ghana’s economic future.</p><a class="text-link dark" href="#contact">Meet the academy <span>→</span></a></div></div>
+      <div class="container intro-grid row g-5"><p class="section-kicker col-md-4">01 / WHO WE ARE</p><div class="col-md-8"><h2>A home for brave ideas and <em>better development.</em></h2><p class="lead">Africa Innovation &amp; Development Academy brings together curious minds, communities, institutions and decision makers to address the questions that shape Ghana’s economic future.</p><a class="text-link dark" href="#founder">Meet the academy <span>→</span></a></div></div>
       <div class="container values">
         <article><span class="number">01</span><h3>Evidence led</h3><p>We turn rigorous research into clear, useful insight that informs decisions.</p></article>
         <article><span class="number">02</span><h3>People centred</h3><p>We make room for local knowledge, lived experience and diverse voices.</p></article>
         <article><span class="number">03</span><h3>Action oriented</h3><p>We convene, test and connect ideas to create meaningful change.</p></article>
+      </div>
+    </section>
+
+    <section class="section founder-section" id="founder" aria-labelledby="founder-name">
+      <div class="container founder-profile">
+        <figure class="founder-portrait"><img src="qwaata.png" alt="Dr. Seth Antwi Asiamah, founder of AIDA" width="1254" height="1254" loading="lazy"></figure>
+        <div class="founder-biography">
+          <p class="section-kicker">MEET OUR FOUNDER</p>
+          <h2 id="founder-name">Dr. Seth Antwi Asiamah</h2>
+          <p class="founder-role">Founder · Africa Innovation &amp; Development Academy</p>
+          <p>Dr. Seth Antwi Asiamah is an Economist, Researcher and Educationist with experience in higher education, quantitative research and applied economic analysis.</p>
+          <p>He holds a PhD in Economics from the University of Lincoln, United Kingdom, an MSc in International Business Economics, a BSc in Economics and Entrepreneurship, and a Postgraduate Diploma in Education (Mathematics).</p>
+          <a class="text-link" href="governance.php#founder">Explore our governance and team <span>→</span></a>
+        </div>
       </div>
     </section>
 
@@ -90,7 +83,7 @@ if ($submitted) {
 
     <section class="cta"><div class="container cta-inner"><p class="eyebrow"><span></span> THE NEXT CHAPTER STARTS TOGETHER</p><h2>Let’s build an economy that works for <em>everyone.</em></h2><a class="button button-light" href="#contact">Start a conversation <span>→</span></a></div></section>
 
-    <section class="contact section" id="contact"><div class="container contact-grid"><div><p class="section-kicker">04 / GET IN TOUCH</p><h2>Bring your<br><em>question.</em></h2><p class="lead">Whether you have a research idea, a partnership in mind or a conversation worth having, we would love to hear from you.</p><p class="contact-note">Ghana · Africa · The world</p></div><form class="contact-form" method="post" action="#contact" novalidate><div class="form-heading"><span class="form-mark">✦</span><div><h3>Send us a message</h3><p>We will be pleased to hear from you.</p></div></div><label>Your name<input name="name" required value="<?= htmlspecialchars($_POST['name'] ?? '', ENT_QUOTES, 'UTF-8') ?>"></label><label>Email address<input type="email" name="email" required value="<?= htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>"></label><label>What would you like to explore?<textarea name="message" rows="4" required><?= htmlspecialchars($_POST['message'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea></label><button class="button button-gold" type="submit">Send your message <span>→</span></button><?php if ($status): ?><p class="form-status" role="status"><?= $status ?></p><?php endif; ?></form></div></section>
+    <section class="contact section contact-invitation" id="contact"><div class="container"><p class="section-kicker">04 / GET IN TOUCH</p><h2>Let’s start a <em>conversation.</em></h2><p class="lead">Join the AIDA community or send our team a question. Choose the path that best fits your interest.</p><div class="contact-options"><a class="contact-option" href="join.php"><span>JOIN &amp; COLLABORATE</span><h3>Partner with AIDA</h3><p>Apply for membership, volunteering or research collaboration.</p><b>Start your application →</b></a><a class="contact-option" href="contact.php"><span>GENERAL ENQUIRIES</span><h3>Speak to our team</h3><p>Send a question, share an idea or ask about our work.</p><b>Send a message →</b></a></div></div></section>
   </main>
   <footer><div class="container footer-inner"><a class="footer-brand" href="#top"><img src="Logo.png" alt="AIDA"></a><p>Research. Dialogue. Impact.</p><p>© <?= date('Y') ?> Africa Innovation &amp; Development Academy.</p><a href="#top">Back to top ↑</a></div></footer>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
