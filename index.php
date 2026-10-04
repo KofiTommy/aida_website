@@ -68,6 +68,8 @@ require_once __DIR__ . '/app/public.php';
       </div>
     </section>
 
+    <?php require __DIR__ . '/app/team-profiles.php'; ?>
+
     <section class="executive-band" aria-label="AIDA perspective"><div class="container executive-band-inner"><p class="band-label">AIDA PERSPECTIVE <span></span> GHANA</p><p class="band-statement">Evidence gives us <em>clarity.</em> Dialogue gives us <em>direction.</em> Impact gives us <em>purpose.</em></p><a href="#approach" class="band-link">How AIDA works <span>→</span></a></div></section>
 
     <section class="work section" id="work"><div class="container">

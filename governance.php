@@ -32,6 +32,7 @@
         </div>
       </div>
     </section>
+    <?php require __DIR__ . '/app/team-profiles.php'; ?>
   </main>
   <footer><div class="container footer-inner"><a class="footer-brand" href="index.php"><img src="Logo.png" alt="AIDA"></a><p>Research. Dialogue. Impact.</p><p>© <?= date('Y') ?> Africa Innovation &amp; Development Academy.</p><a href="#top">Back to top ↑</a></div></footer><script src="assets/js/main.js"></script>
 </body></html>
