@@ -3,7 +3,7 @@
     <div class="team-heading"><p class="section-kicker">OUR PEOPLE</p><h2 id="team-heading">Meet the people behind <em>AIDA.</em></h2><p>Experience in project delivery, research and innovation.</p></div>
     <div class="team-profile-grid">
       <article class="team-profile-card" aria-labelledby="jacob-name">
-        <img src="diameh.jpeg" alt="Jacob Diameh, Project Manager" width="1254" height="1254" loading="lazy">
+        <img src="diameh.webp" alt="Jacob Diameh, Project Manager" width="880" height="880" loading="lazy">
         <div class="team-profile-copy">
           <p class="team-profile-role">Project Manager</p>
           <h3 id="jacob-name">Jacob Diameh</h3>
@@ -11,7 +11,7 @@
         </div>
       </article>
       <article class="team-profile-card" aria-labelledby="christian-name">
-        <img src="sarfo.jpeg" alt="Dr Christian Agyapong Sarfo" width="1280" height="1280" loading="lazy">
+        <img src="sarfo.webp" alt="Dr Christian Agyapong Sarfo" width="880" height="880" loading="lazy">
         <div class="team-profile-copy">
           <p class="team-profile-role">Scholar of Entrepreneurship, Strategy &amp; Innovation</p>
           <h3 id="christian-name">Dr Christian Agyapong Sarfo</h3>

@@ -21,7 +21,7 @@
     <section class="section"><div class="container"><div class="policy-heading"><div><p class="section-kicker">03 / POLICIES &amp; DISCLOSURES</p><h2>How we hold ourselves <em>to account.</em></h2></div><p>As AIDA’s governance documents are formally approved, they will be published here for public access.</p></div><div class="policy-list"><a href="#contact"><span>01</span><b>Code of conduct</b><small>Coming soon</small><em>→</em></a><a href="#contact"><span>02</span><b>Safeguarding policy</b><small>Coming soon</small><em>→</em></a><a href="#contact"><span>03</span><b>Privacy &amp; data protection</b><small>Coming soon</small><em>→</em></a><a href="#contact"><span>04</span><b>Complaints &amp; feedback</b><small>Coming soon</small><em>→</em></a><a href="#contact"><span>05</span><b>Annual report &amp; accounts</b><small>Coming soon</small><em>→</em></a></div></div></section>
     <section class="section founder-section" id="founder" aria-labelledby="founder-name">
       <div class="container founder-profile">
-        <figure class="founder-portrait"><img src="qwaata.png" alt="Dr. Seth Antwi Asiamah, founder of AIDA" width="1254" height="1254" loading="lazy"></figure>
+        <figure class="founder-portrait"><img src="qwaata.webp" alt="Dr. Seth Antwi Asiamah, founder of AIDA" width="880" height="880" loading="lazy"></figure>
         <div class="founder-biography">
           <p class="section-kicker">04 / MEET OUR FOUNDER</p>
           <h2 id="founder-name">Dr. Seth Antwi Asiamah</h2>

@@ -56,7 +56,7 @@ require_once __DIR__ . '/app/public.php';
 
     <section class="section founder-section" id="founder" aria-labelledby="founder-name">
       <div class="container founder-profile">
-        <figure class="founder-portrait"><img src="qwaata.png" alt="Dr. Seth Antwi Asiamah, founder of AIDA" width="1254" height="1254" loading="lazy"></figure>
+        <figure class="founder-portrait"><img src="qwaata.webp" alt="Dr. Seth Antwi Asiamah, founder of AIDA" width="880" height="880" loading="lazy"></figure>
         <div class="founder-biography">
           <p class="section-kicker">MEET OUR FOUNDER</p>
           <h2 id="founder-name">Dr. Seth Antwi Asiamah</h2>
