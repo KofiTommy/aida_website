@@ -2,7 +2,7 @@
 $homepageItems=[];
 try {
     if (function_exists('db')) {
-        $homepageItems=db()->query("SELECT c.* FROM content c JOIN site_settings s ON s.setting_key=CONCAT('homepage_content_',c.id) AND s.setting_value='1' WHERE c.status='published' ORDER BY COALESCE(c.published_at,c.created_at) DESC, c.id DESC LIMIT 6")->fetchAll();
+        $homepageItems=db()->query("SELECT c.* FROM content c JOIN site_settings s ON s.setting_key=CONCAT('homepage_content_',c.id) AND s.setting_value='1' WHERE c.status='published' AND NOT EXISTS (SELECT 1 FROM content_state t WHERE t.content_id=c.id AND t.deleted_at IS NOT NULL) ORDER BY COALESCE(c.published_at,c.created_at) DESC, c.id DESC LIMIT 6")->fetchAll();
     }
 } catch (Throwable $error) { error_log('AIDA homepage content could not be loaded.'); }
 if (!$homepageItems) return;
@@ -13,12 +13,12 @@ $homepageLabels=['insight'=>'Insight','publication'=>'Publication','project'=>'P
   <div class="resource-grid">
   <?php foreach($homepageItems as $entry): ?>
     <article class="resource-card">
-      <?php if($entry['featured_image']): ?><img src="<?=e($entry['featured_image'])?>" alt="" loading="lazy"><?php endif; ?>
+      <?php if($entry['featured_image']): ?><img src="<?=e(media_url($entry['featured_image']))?>" alt="" loading="lazy"><?php endif; ?>
       <p class="section-kicker"><?=e($homepageLabels[$entry['content_type']]??'Resource')?> &middot; <?=e(date('d M Y',strtotime($entry['published_at']?:$entry['created_at'])))?></p>
       <h2><?=e($entry['title'])?></h2><p><?=e($entry['summary'])?></p>
       <div class="resource-actions"><a href="insights.php#content-<?=$entry['id']?>">Read more &rarr;</a>
-        <?php if($entry['document_path']): ?><a href="<?=e($entry['document_path'])?>" target="_blank" rel="noopener">Open document &rarr;</a><?php endif; ?>
-        <?php if($entry['video_url']): ?><a href="<?=e($entry['video_url'])?>" target="_blank" rel="noopener">Watch video &rarr;</a><?php endif; ?>
+        <?php if($entry['document_path']): ?><a href="<?=e(media_url($entry['document_path']))?>" target="_blank" rel="noopener">Open document &rarr;</a><?php endif; ?>
+        <?php if($entry['video_url']): ?><a href="<?=e(media_url($entry['video_url']))?>" target="_blank" rel="noopener">Watch video &rarr;</a><?php endif; ?>
       </div>
     </article>
   <?php endforeach; ?>

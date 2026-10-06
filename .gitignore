@@ -1,4 +1,6 @@
 /app/config.local.php
 /storage/setup.lock
+/storage/*
+!/storage/.htaccess
 /uploads/*
 !/uploads/.htaccess
