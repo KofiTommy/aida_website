@@ -45,6 +45,8 @@ require_once __DIR__ . '/app/public.php';
       <div class="container hero-foot"><p>Building the conditions for innovation to become shared prosperity.</p><a href="#about" aria-label="Scroll to about">SCROLL <span>↓</span></a></div>
     </section>
 
+    <?php require __DIR__ . '/app/homepage-content.php'; ?>
+
     <section class="intro section" id="about">
       <div class="container intro-grid row g-5"><p class="section-kicker col-md-4">01 / WHO WE ARE</p><div class="col-md-8"><h2>A home for brave ideas and <em>better development.</em></h2><p class="lead">Africa Innovation &amp; Development Academy brings together curious minds, communities, institutions and decision makers to address the questions that shape Ghana’s economic future.</p><a class="text-link dark" href="#founder">Meet the academy <span>→</span></a></div></div>
       <div class="container values">
@@ -75,9 +77,9 @@ require_once __DIR__ . '/app/public.php';
     <section class="work section" id="work"><div class="container">
       <div class="section-heading"><div><p class="section-kicker light">02 / WHAT WE DO</p><h2>From questions to <em>collective action.</em></h2></div><p>We work at the intersection of research, innovation and public dialogue where lasting economic transformation begins.</p></div>
       <div class="work-grid row g-0">
-        <article class="work-card featured col-md-6 col-lg-5"><div class="icon">⌁</div><p class="card-label">AIDA RESEARCH</p><h3>Research that sees the whole picture.</h3><p>Independent analysis on the economic, social and institutional challenges shaping Ghana and the wider continent.</p><a href="#contact">Learn more <span>→</span></a></article>
-        <article class="work-card col-md-6 col-lg"><div class="icon">◌</div><p class="card-label">AIDA DIALOGUES</p><h3>Conversations that open possibilities.</h3><p>Inclusive spaces where citizens, experts and leaders can exchange ideas and build common ground.</p><a href="#contact">Learn more <span>→</span></a></article>
-        <article class="work-card col-md-6 col-lg"><div class="icon">↗</div><p class="card-label">AIDA IMPACT</p><h3>Innovation that reaches people.</h3><p>Practical initiatives, partnerships and capacity building designed to turn insight into lasting impact.</p><a href="#contact">Learn more <span>→</span></a></article>
+        <article class="work-card featured col-md-6 col-lg-5"><div class="icon">⌁</div><p class="card-label">AIDA RESEARCH</p><h3><a class="work-title-link" href="insights.php?type=publication">Research that sees the whole picture.</a></h3><p>Independent analysis on the economic, social and institutional challenges shaping Ghana and the wider continent.</p><a href="insights.php?type=publication">View research papers <span>→</span></a></article>
+        <article class="work-card col-md-6 col-lg"><div class="icon">◌</div><p class="card-label">AIDA DIALOGUES</p><h3><a class="work-title-link" href="insights.php?type=event">Conversations that open possibilities.</a></h3><p>Inclusive spaces where citizens, experts and leaders can exchange ideas and build common ground.</p><a href="insights.php?type=event">Explore events &amp; dialogues <span>→</span></a></article>
+        <article class="work-card col-md-6 col-lg"><div class="icon">↗</div><p class="card-label">AIDA IMPACT</p><h3><a class="work-title-link" href="insights.php?type=project">Innovation that reaches people.</a></h3><p>Practical initiatives, partnerships and capacity building designed to turn insight into lasting impact.</p><a href="insights.php?type=project">Explore projects &amp; impact <span>→</span></a></article>
       </div>
     </div></section>
 

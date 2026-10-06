@@ -11,9 +11,9 @@
         </div>
       </article>
       <article class="team-profile-card" aria-labelledby="christian-name">
-        <img src="sarfo.webp" alt="Dr Christian Agyapong Sarfo" width="880" height="880" loading="lazy">
+        <img src="sarfo.webp" alt="Dr Christian Agyapong Sarfo, Chairperson" width="880" height="880" loading="lazy">
         <div class="team-profile-copy">
-          <p class="team-profile-role">Scholar of Entrepreneurship, Strategy &amp; Innovation</p>
+          <p class="team-profile-role">Chairperson</p>
           <h3 id="christian-name">Dr Christian Agyapong Sarfo</h3>
           <p>Dr Christian Agyapong Sarfo is a scholar of entrepreneurship, strategy and innovation, with research interests spanning entrepreneurial ecosystems, organisational learning, innovation, sustainability, and the growth and resilience of small and medium-sized enterprises. He is a Lecturer in Innovation and Entrepreneurship at Lincoln International Business School, University of Lincoln, UK, and holds a PhD in Strategic Management from the University of Otago, New Zealand.</p>
           <details class="team-full-profile">
