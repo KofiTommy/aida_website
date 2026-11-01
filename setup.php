@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt=$pdo->prepare('INSERT INTO users (name,email,password_hash,role) VALUES (?,?,?,"administrator")');
             $stmt->execute([$owner,$email,password_hash($ownerPass,PASSWORD_DEFAULT)]);
             $key=bin2hex(random_bytes(32));
-            $config="<?php\nreturn ".var_export(['db'=>['host'=>$host,'port'=>$port,'name'=>$name,'user'=>$user,'pass'=>$pass],'app_key'=>$key,'upload_max_mb'=>25],true).";\n";
+            $config="<?php\nreturn ".var_export(['db'=>['host'=>$host,'port'=>$port,'name'=>$name,'user'=>$user,'pass'=>$pass],'app_key'=>$key,'upload_max_mb'=>200],true).";\n";
             if (file_put_contents(__DIR__.'/app/config.local.php',$config,LOCK_EX) === false) throw new RuntimeException('Could not write the local configuration file.');
             file_put_contents(__DIR__.'/storage/setup.lock', date('c'));
             header('Location: admin/login.php?installed=1'); exit;

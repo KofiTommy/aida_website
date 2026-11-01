@@ -9,7 +9,7 @@ return [
         'pass' => '',
     ],
     'app_key' => 'replace-with-a-long-random-secret-at-least-32-characters',
-    'upload_max_mb' => 25,
+    'upload_max_mb' => 200,
     // Optional local ClamAV executable. Unavailable/failing configured scanners block uploads.
     'malware_scanner' => null,
 ];
