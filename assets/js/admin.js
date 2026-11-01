@@ -53,6 +53,11 @@
         } catch (_) {
           if (request.status === 419 || redirectedToLogin) feedback.textContent = 'Your session expired. Reload the page and sign in before retrying.';
           else if ([408, 413, 502, 503, 504].includes(request.status)) feedback.textContent = `The server could not accept this upload (HTTP ${request.status}). Check the hosting upload-size and timeout limits, or try a smaller file.`;
+          else if (request.status === 404) {
+            let endpoint = location.pathname;
+            try { endpoint = new URL(request.responseURL, location.href).pathname; } catch (_) {}
+            feedback.textContent = `The upload endpoint was not found (HTTP 404): ${endpoint}. Check that this exact path exists on the live site and that admin/index.php was deployed.`;
+          }
           else feedback.textContent = `The server returned an unexpected response (HTTP ${request.status}). It may be an HTML error page instead of the upload response. Check Hostinger's PHP error log and verify the upload before retrying.`;
           release();
           return;
