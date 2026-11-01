@@ -46,19 +46,22 @@
       request.upload.addEventListener('load', () => { feedback.textContent = 'Upload received. Validating and saving…'; });
       const release = () => { buttons.forEach(button => { button.disabled = false; }); if (progress) progress.hidden = true; };
       request.addEventListener('load', () => {
+        const redirectedToLogin = /\/admin\/login\.php(?:[?#]|$)/i.test(request.responseURL);
+        let result;
         try {
-          const result = JSON.parse(request.responseText);
-          if (result.error) { feedback.textContent = result.message; release(); return; }
-          const target = new URL(result.redirect, location.href);
-          if (target.origin !== location.origin) throw new Error('Invalid destination');
-          location.assign(target.href);
+          result = JSON.parse(request.responseText);
         } catch (_) {
-          const redirectedToLogin = /\/admin\/login\.php(?:[?#]|$)/i.test(request.responseURL);
           if (request.status === 419 || redirectedToLogin) feedback.textContent = 'Your session expired. Reload the page and sign in before retrying.';
           else if ([408, 413, 502, 503, 504].includes(request.status)) feedback.textContent = `The server could not accept this upload (HTTP ${request.status}). Check the hosting upload-size and timeout limits, or try a smaller file.`;
-          else feedback.textContent = `The server returned an unexpected response (HTTP ${request.status}). Check the hosting/PHP error log; verify the upload before retrying.`;
+          else feedback.textContent = `The server returned an unexpected response (HTTP ${request.status}). It may be an HTML error page instead of the upload response. Check Hostinger's PHP error log and verify the upload before retrying.`;
           release();
+          return;
         }
+        if (result.error) { feedback.textContent = result.message || 'The server rejected the upload.'; release(); return; }
+        if (typeof result.redirect !== 'string') { feedback.textContent = 'The server response was incomplete. Check the hosting error log and verify the upload before retrying.'; release(); return; }
+        const target = new URL(result.redirect, location.href);
+        if (target.origin !== location.origin) { feedback.textContent = 'The server returned an invalid destination. Verify the upload before retrying.'; release(); return; }
+        location.assign(target.href);
       });
       request.addEventListener('error', () => { feedback.textContent = 'Connection lost. Check the library/content list before retrying to avoid duplicates.'; release(); });
       request.send(data);
