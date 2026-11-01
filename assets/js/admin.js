@@ -52,7 +52,13 @@
           const target = new URL(result.redirect, location.href);
           if (target.origin !== location.origin) throw new Error('Invalid destination');
           location.assign(target.href);
-        } catch (_) { feedback.textContent = request.status === 419 ? 'Your session expired. Reload the page and sign in before retrying.' : 'The request could not be completed. Check your connection and sign-in session before retrying.'; release(); }
+        } catch (_) {
+          const redirectedToLogin = /\/admin\/login\.php(?:[?#]|$)/i.test(request.responseURL);
+          if (request.status === 419 || redirectedToLogin) feedback.textContent = 'Your session expired. Reload the page and sign in before retrying.';
+          else if ([408, 413, 502, 503, 504].includes(request.status)) feedback.textContent = `The server could not accept this upload (HTTP ${request.status}). Check the hosting upload-size and timeout limits, or try a smaller file.`;
+          else feedback.textContent = `The server returned an unexpected response (HTTP ${request.status}). Check the hosting/PHP error log; verify the upload before retrying.`;
+          release();
+        }
       });
       request.addEventListener('error', () => { feedback.textContent = 'Connection lost. Check the library/content list before retrying to avoid duplicates.'; release(); });
       request.send(data);

@@ -12,7 +12,14 @@ $user=current_user();
 
 if ($_SERVER['REQUEST_METHOD']==='POST') {
     if (empty($_POST) && (int)($_SERVER['CONTENT_LENGTH']??0)>0) {
-        flash('error','The attachments exceed the server upload limit. Please select smaller files.');
+        $message='The upload exceeded the server request limit. Increase PHP post_max_size and upload_max_filesize, or select a smaller file.';
+        if (($_SERVER['HTTP_X_REQUESTED_WITH']??'')==='XMLHttpRequest') {
+            http_response_code(413);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['error'=>true,'message'=>$message]);
+            exit;
+        }
+        flash('error',$message);
         header('Location: index.php?section=editor'); exit;
     }
     verify_csrf(); $action=$_POST['action'] ?? '';
@@ -76,4 +83,3 @@ if ($section==='applications') {
 <h3>Skills and experience</h3><p><?=nl2br(e($application['expertise']))?></p><h3>Reason for joining</h3><p><?=nl2br(e($application['motivation']))?></p>
 <form method="post" class="application-review"><input type="hidden" name="csrf" value="<?=csrf()?>"><input type="hidden" name="action" value="review_application"><input type="hidden" name="id" value="<?=$application['id']?>"><label>Status <select name="status"><?php foreach(['new','reviewing','accepted','declined'] as $s): ?><option value="<?=$s?>" <?=$application['status']===$s?'selected':''?>><?=ucfirst($s)?></option><?php endforeach; ?></select></label><button class="admin-button">Save status</button></form></details><?php endforeach; ?></section>
 <?php admin_footer(); exit; }
-
