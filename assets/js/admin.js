@@ -38,7 +38,10 @@
       feedback.textContent = files.length ? 'Uploading… please keep this page open.' : 'Saving…';
       if (progress) { progress.hidden = false; progress.value = 0; }
       const request = new XMLHttpRequest();
-      request.open('POST', form.action);
+      // Note: form.action is shadowed by the hidden input named "action",
+      // so read the attribute explicitly to get the real endpoint URL.
+      const endpoint = new URL(form.getAttribute('action') || location.href, location.href);
+      request.open('POST', endpoint.href);
       request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
       request.upload.addEventListener('progress', event => {
         if (event.lengthComputable && progress) progress.value = Math.round(event.loaded * 100 / event.total);
