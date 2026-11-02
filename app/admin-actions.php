@@ -62,8 +62,9 @@ function save_content_action(): never {
     }catch(Throwable $error){
         if(db()->inTransaction())db()->rollBack();cleanup_uploads($created);
         $_SESSION['content_form']=['id'=>$originalId,'values'=>array_intersect_key($_POST,array_flip(['title','slug','summary','body','status','content_type','event_date','video_link','authors','category','document_date']))+['show_on_homepage'=>isset($_POST['show_on_homepage'])]];
-        error_log('AIDA save content: '.$error->getMessage());
-        admin_redirect('editor'.($originalId?'&id='.$originalId:''),$error instanceof PDOException?'Content could not be saved because of a database error. The details are in the private error log.':$error->getMessage(),true);
+        $reference=bin2hex(random_bytes(5));
+        error_log('AIDA save content '.$reference.': '.$error->getMessage());
+        admin_redirect('editor'.($originalId?'&id='.$originalId:''),$error instanceof PDOException?'Content could not be saved because of a database error (reference '.$reference.'). The details are in the private error log.':$error->getMessage(),true);
     }
 }
 function backend_actions(string $action): void {
