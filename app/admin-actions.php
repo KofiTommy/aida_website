@@ -31,6 +31,11 @@ function save_content_action(): never {
         if($video && (!filter_var($video,FILTER_VALIDATE_URL) || !in_array(strtolower((string)parse_url($video,PHP_URL_SCHEME)),['https','http'],true)))throw new RuntimeException('Enter a valid https:// video link.');
         if($video && (isset($uploads['video_file']) || !empty($_POST['video_existing'])))throw new RuntimeException('Choose a video file or an external video link, not both.');
         $slug=slugify(trim((string)($_POST['slug']??''))?:$title);if(strlen($slug)>255)throw new RuntimeException('Shorten the URL label.');
+        $conflict=db()->prepare('SELECT c.title, IF(t.deleted_at IS NULL,0,1) trashed FROM content c LEFT JOIN content_state t ON t.content_id=c.id AND t.deleted_at IS NOT NULL WHERE c.content_type=? AND c.slug=? AND c.id<>? LIMIT 1');
+        $conflict->execute([$type,$slug,$id]);
+        if($clash=$conflict->fetch())throw new RuntimeException($clash['trashed']
+            ?'The URL label "'.$slug.'" is used by an item in Trash. Restore it, permanently delete it, or choose a different label.'
+            :'The URL label "'.$slug.'" is already used by "'.$clash['title'].'". Choose a different label.');
         db()->beginTransaction();
         if($id){$q=db()->prepare('SELECT id FROM content WHERE id=? FOR UPDATE');$q->execute([$id]);$existing=content_for_edit($id);}
         foreach(['image'=>'featured_image','document'=>'document_path','video'=>'video_url'] as $kind=>$column){
@@ -58,7 +63,7 @@ function save_content_action(): never {
         if(db()->inTransaction())db()->rollBack();cleanup_uploads($created);
         $_SESSION['content_form']=['id'=>$originalId,'values'=>array_intersect_key($_POST,array_flip(['title','slug','summary','body','status','content_type','event_date','video_link','authors','category','document_date']))+['show_on_homepage'=>isset($_POST['show_on_homepage'])]];
         error_log('AIDA save content: '.$error->getMessage());
-        admin_redirect('editor'.($originalId?'&id='.$originalId:''),$error instanceof PDOException?'Content could not be saved. Check the URL label is unique and try again.':$error->getMessage(),true);
+        admin_redirect('editor'.($originalId?'&id='.$originalId:''),$error instanceof PDOException?'Content could not be saved because of a database error. The details are in the private error log.':$error->getMessage(),true);
     }
 }
 function backend_actions(string $action): void {
